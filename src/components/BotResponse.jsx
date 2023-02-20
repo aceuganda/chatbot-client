@@ -2,25 +2,27 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 
 const BotResponse = ({ response }) => {
-  const [botResoponse, setBotResponse] = useState("");
+  const [botResponse, setBotResponse] = useState("");
 
   useEffect(() => {
-    let index = 1;
+    let index = 0;
     let msg = setInterval(() => {
-      setBotResponse(response.slice(0, index));
-      if (index >= response.length) {
+      if (index < response.length) {
+        const currentMsg = response[index];
+        if (currentMsg.text) {
+          setBotResponse(prevResponse => prevResponse + currentMsg.text);
+        } else if (currentMsg.image) {
+          setBotResponse(currentMsg.image);
+        }
+        index++;
+      } else {
         clearInterval(msg);
       }
-      index++;
     }, 100);
+    return () => clearInterval(msg);
   }, [response]);
 
-  return (
-    <div>
-      {botResoponse}
-      {botResoponse === response ? "" : "|"}
-    </div>
-  );
+  return <div>{botResponse}</div>;
 };
 
 export default BotResponse;

@@ -35,7 +35,7 @@ function App() {
           ...chatLog,
           {
             chatPrompt: inputPrompt,
-            botMessage: data[0].text,
+            botMessage: data
           },
         ]);
         setErr(false);
