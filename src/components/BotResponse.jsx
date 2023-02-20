@@ -22,7 +22,7 @@ const BotResponse = ({ response }) => {
     return () => clearInterval(msg);
   }, [response]);
 
-  return <div>{botResponse}</div>;
+  return <div>{botResponse === ""? "Sorry repeat for me, I didnt get that": botResponse}</div>;
 };
 
 export default BotResponse;
