@@ -313,4 +313,15 @@ nav svg {
   #introsection h2 {
     font-size: 14px;
   }
+ 
+}
+.version{
+  font-size: 11px;
+  color: grey;
+  text-align: left;
+  padding: 10px;
+  position: absolute;
+  bottom: 0;
+
+
 }

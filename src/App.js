@@ -175,8 +175,12 @@ function App() {
           text="Updates & FAQ"
           link="https://ace.ac.ug"
         />
+        
+          <div className="version">
+            V1.0: Last updated: 20 February 2023
+          </div>
       </aside>
-
+      
       <section className="chatBox">
         {chatLog.length > 0 ? (
           <div className="chatLogWrapper">
