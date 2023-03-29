@@ -1,6 +1,6 @@
 import "./normal.css";
 import "./App.css";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Avatar from "./components/Avatar";
 import NewChat from "./components/NewChat";
 import NavPrompt from "./components/NavPrompt";
@@ -9,13 +9,77 @@ import Error from "./components/Error";
 import NavLinks from "./components/NavLink";
 import BotResponse from "./components/BotResponse";
 import IntroSection from "./components/IntroSection";
+import axios from "axios";
 
 function App() {
   const [showMenu, setShowMenu] = useState(false);
   const [inputPrompt, setInputPrompt] = useState("");
   const [chatLog, setChatLog] = useState([]);
   const [err, setErr] = useState(false);
+const [messages, setMessages] = useState([]);
 
+
+
+//Implementation of earlier conversations
+    // Reference to the last message element for scrolling
+    const messagesEndRef = useRef(null);
+
+    //load conversation history on mount
+    useEffect(() => {
+
+
+        
+        axios.get("http://127.0.0.1:1050/messages", {
+            params: {
+                sender_id: "mike"
+            },
+            headers:{
+                'Content-Type':'application/json'
+            }
+            }).then((response) => {
+                console.log("Response: ", response.data)
+            const history = response.data;
+            const pairs = []
+            let lastUserMessage = null;
+
+            //sort messages by timestamp
+            history.sort((a, b) => a.timestamp - b.timestamp);
+
+            //iterate through messages and group them in pairs
+            for (const message of history) {
+                if (message.event === "user") {
+                  lastUserMessage = message.text;
+                } else if (message.event === "bot" && lastUserMessage !== null) {
+                  pairs.push({ user: lastUserMessage, bot: message.text });
+                  lastUserMessage = null;
+                }
+              }
+            
+              setMessages(pairs);
+              //set chatlog by looping messages and adding them to the chatlog
+              setChatLog(pairs.map((pair) => ({ chatPrompt: pair.user, botMessage: pair.bot })));
+
+
+              /*setChatLog([
+                ...chatLog,
+                {
+                    chatPrompt: pairs.user,
+                    botMessage: pairs.bot
+                },
+              ])*/
+            //show messages in the console
+              console.log("Message pairs: ", messages);
+                  
+        });
+    }, []);
+
+
+    console.log("chatlog: ", chatLog);
+
+
+
+
+//handle submit
   const handleSubmit = (e) => {
     e.preventDefault();
     setChatLog([...chatLog, { chatPrompt: inputPrompt }]);
@@ -29,7 +93,7 @@ function App() {
         });
         const data = await response.json();
 
-        console.log("Response: ", data)
+        console.log("Response back from model: ", data)
 
         setChatLog([
           ...chatLog,
@@ -209,7 +273,7 @@ function App() {
                       <div id="chatPrompt">{chat.chatPrompt}</div>
                     </div>
                   </div>
-
+                    
                   <div className="botMessageMainContainer">
                     <div className="botMessageWrapper">
                       <Avatar bg="white" className="openaiSVG">
@@ -564,6 +628,7 @@ function App() {
                           </svg>
 
                       </Avatar>
+                    
                       {chat.botMessage ? (
                         <div id="botMessage">
                           <BotResponse response={chat.botMessage} />
@@ -579,7 +644,11 @@ function App() {
               ))}
           </div>
         ) : (
+            <>
           <IntroSection />
+          <div ref={messagesEndRef} />
+            </>
+
         )}
 
         <form onSubmit={handleSubmit}>
