@@ -1,0 +1,21 @@
+-- Table: public.users
+
+-- DROP TABLE public.users;
+
+CREATE TABLE public.users
+(
+    email character varying(128) COLLATE pg_catalog."default" NOT NULL,
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    picture character varying COLLATE pg_catalog."default",
+    username character varying(128) COLLATE pg_catalog."default" NOT NULL,
+    password character varying(128) COLLATE pg_catalog."default",
+    created_at timestamp without time zone,
+    CONSTRAINT users_pkey PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.users
+    OWNER to postgres;
